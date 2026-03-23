@@ -142,6 +142,9 @@ async function refreshData() {
         renderSchoolsPage();
         renderIntakePage();
 
+        // Re-initialize dynamic content (in case config changed)
+        initializeDynamicContent();
+
         btn.textContent = '✓ Data Updated';
         setTimeout(() => {
             btn.textContent = originalText;
@@ -196,6 +199,77 @@ function init() {
     renderSchoolsPage();
     renderIntakePage();
     renderEditorPage();
+
+    // Initialize dynamic HTML from config
+    initializeDynamicContent();
+}
+
+function initializeDynamicContent() {
+    // Generate year badges
+    const badges = document.getElementById('yearBadges');
+    if (badges) {
+        const years = getYears();
+        badges.innerHTML = years.map((y, i) => {
+            const label = getYearLabel(y);
+            const badgeClass = `badge-${y}`;
+            return `<span class="year-badge ${badgeClass}">${label}</span>`;
+        }).join('');
+    }
+
+    // Generate year select options (program page)
+    const yearSel = document.getElementById('programYearSel');
+    if (yearSel) {
+        const years = getYears();
+        yearSel.innerHTML = years.map((y, i) =>
+            `<option value="${y}" ${i === years.length - 1 ? 'selected' : ''}>${getYearLabel(y)}</option>`
+        ).join('');
+        yearSel.addEventListener('change', renderProgramsPage);
+    }
+
+    // Update stat card titles (intake page)
+    const years = getYears();
+    years.forEach(year => {
+        const el = document.getElementById(`intake${year}Label`);
+        if (el) el.textContent = `Total Intake ${getYearLabel(year)}`;
+    });
+
+    // Generate table headers (editor page)
+    const tableHead = document.getElementById('editorTableHead');
+    if (tableHead) {
+        const headerRow = `
+            <tr>
+                <th>Program</th>
+                <th>School</th>
+                ${years.map(y => `<th colspan="3">${getYearLabel(y)}</th>`).join('')}
+            </tr>
+            <tr class="subheader">
+                <th></th>
+                <th></th>
+                ${years.map(y => '<th>Intake</th><th>Admissions</th><th>Withdrawals</th>').join('')}
+            </tr>
+        `;
+        tableHead.innerHTML = headerRow;
+    }
+
+    // Update brand subtitle (sidebar)
+    const subtitle = document.getElementById('brandSubtitle');
+    if (subtitle) {
+        const firstYear = years[0];
+        const lastYear = years[years.length - 1];
+        subtitle.textContent = `Admissions ${firstYear}–${lastYear % 100}`;
+    }
+
+    // Update current date (sidebar)
+    const dateEl = document.getElementById('currentDate');
+    if (dateEl) {
+        dateEl.textContent = getConfig().currentDate || 'N/A';
+    }
+
+    // Update page title in browser
+    const titleEl = document.getElementById('pageTitle_head');
+    if (titleEl && years.length > 0) {
+        titleEl.textContent = `MRU Admissions Intelligence (${years[0]}–${years[years.length - 1]})`;
+    }
 }
 
 function populateSelect(id, options, defaultVal) {
