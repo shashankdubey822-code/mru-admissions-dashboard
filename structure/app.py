@@ -1,7 +1,6 @@
 """
 MRU Admissions Dashboard — HuggingFace Space Backend
-Reads directly from Google Sheets API. Dynamically discovers all date sheets.
-No database, no sync endpoint. Real-time Google Sheets integration.
+Reads directly from Google Sheets API. No database, no sync endpoint.
 
 HF Secrets required:
   GOOGLE_SHEET_ID  — the spreadsheet ID
@@ -28,11 +27,27 @@ app.add_middleware(
 SHEET_ID = os.environ.get("GOOGLE_SHEET_ID", "")
 API_KEY  = os.environ.get("GOOGLE_API_KEY", "")
 
+# All 21 date snapshot sheet names (must match exactly as in Google Sheets)
+DATE_SHEETS = [
+    "1 JAN", "15 Jan", "31 Jan", "15 Feb", "28 Feb",
+    "15 Mar", "31 Mar", "15 Apr", "30 Apr", "15 May",
+    "31 May", "15 Jun", "30 Jun", "15 Jul", "31 Jul",
+    "15 Aug", "31 Aug", "15 Sep", "30 Sep", "15 Oct", "31 Oct"
+]
+
+# Friendly label for each sheet (used as date key in the output JSON)
+SHEET_LABEL = {
+    "1 JAN": "1 Jan",   "15 Jan": "15 Jan",  "31 Jan": "31 Jan",
+    "15 Feb": "15 Feb", "28 Feb": "28 Feb",  "15 Mar": "15 Mar",
+    "31 Mar": "31 Mar", "15 Apr": "15 Apr",  "30 Apr": "30 Apr",
+    "15 May": "15 May", "31 May": "31 May",  "15 Jun": "15 Jun",
+    "30 Jun": "30 Jun", "15 Jul": "15 Jul",  "31 Jul": "31 Jul",
+    "15 Aug": "15 Aug", "31 Aug": "31 Aug",  "15 Sep": "15 Sep",
+    "30 Sep": "30 Sep", "15 Oct": "15 Oct",  "31 Oct": "31 Oct",
+}
+
 # School name rows in the sheet (rows where program column = school name only)
 SCHOOL_NAMES = {"MRSoE", "MRSoM&C", "MRSoS", "MRSoE&H", "MRSoL"}
-
-# Sheets to skip (metadata/summary sheets)
-SKIP_SHEETS = {"Master Data-Date wise", "Master Data School-Datewise"}
 
 
 def to_int(val):
@@ -41,20 +56,6 @@ def to_int(val):
         return int(val) if val not in (None, "", "N/A") else 0
     except (ValueError, TypeError):
         return 0
-
-
-async def get_sheet_names(client: httpx.AsyncClient) -> list:
-    """Fetch all sheet names from the spreadsheet metadata."""
-    url = f"https://sheets.googleapis.com/v4/spreadsheets/{SHEET_ID}"
-    resp = await client.get(url, params={"key": API_KEY})
-    if resp.status_code != 200:
-        return []
-
-    data = resp.json()
-    sheets = data.get("sheets", [])
-    names = [sheet["properties"]["title"] for sheet in sheets]
-    # Filter out metadata sheets, keep only date snapshots
-    return [name for name in names if name not in SKIP_SHEETS]
 
 
 async def fetch_sheet_range(client: httpx.AsyncClient, sheet_name: str, cell_range: str = "A1:J200") -> list:
@@ -169,8 +170,7 @@ def guess_category(name: str) -> str:
 @app.get("/data")
 async def get_data():
     """
-    Dynamically reads all date sheets from Google Sheets and returns the full dashboard JSON.
-    Automatically discovers new date sheets (e.g., "23 March", "29 March").
+    Reads all date sheets from Google Sheets and returns the full dashboard JSON.
     Shape matches dashboard_data.json exactly.
     """
     if not SHEET_ID or not API_KEY:
@@ -180,16 +180,12 @@ async def get_data():
     faculty_breakdown = {}
 
     async with httpx.AsyncClient(timeout=30) as client:
-        # Dynamically fetch all date sheet names
-        date_sheets = await get_sheet_names(client)
-
-        for sheet_name in date_sheets:
+        for sheet_name in DATE_SHEETS:
             rows = await fetch_sheet_range(client, sheet_name)
             if not rows:
                 continue
 
-            # Use sheet name as label (will match format like "31 Oct", "23 March", etc.)
-            label = sheet_name
+            label = SHEET_LABEL[sheet_name]
             records, t24, t25, t26 = parse_date_sheet(rows, label)
 
             if records:
@@ -201,9 +197,6 @@ async def get_data():
                 "2025":  t25,
                 "2026":  t26,
             })
-
-    # Sort time series by date for consistent ordering
-    time_series.sort(key=lambda x: x["date"])
 
     # Build program_categories from last date snapshot
     program_categories = {}

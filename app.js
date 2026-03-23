@@ -103,13 +103,54 @@ async function boot() {
     document.body.appendChild(loadDiv);
 
     try {
-        const res = await fetch('https://vrfefavr-mru-admissions-dashboard.hf.space/data');
+        // Try to load from /data endpoint (live), fall back to static JSON
+        let res;
+        try {
+            res = await fetch('/data');
+        } catch(e) {
+            res = await fetch('dashboard_data.json');
+        }
         DATA = await res.json();
         loadDiv.style.opacity = 0;
         setTimeout(() => loadDiv.remove(), 400);
         init();
     } catch(e) {
         loadDiv.innerHTML = `<p style="color:#fb7185">Error loading data: ${e.message}</p>`;
+    }
+}
+
+async function refreshData() {
+    // Refresh data from backend
+    const btn = document.getElementById('refreshBtn');
+    const originalText = btn.textContent;
+    btn.innerHTML = '<span class="spinner-tiny"></span> Syncing...';
+    btn.disabled = true;
+
+    try {
+        const res = await fetch('/data');
+        if (!res.ok) throw new Error('Failed to fetch data');
+        DATA = await res.json();
+
+        // Re-render all active pages
+        renderOverviewPage();
+        renderInsightsPage();
+        renderTrendsPage();
+        renderProgramsPage();
+        renderSchoolsPage();
+        renderIntakePage();
+
+        btn.textContent = '✓ Data Updated';
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }, 2000);
+    } catch(e) {
+        btn.textContent = '✗ Failed';
+        console.error('Refresh error:', e);
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }, 2000);
     }
 }
 

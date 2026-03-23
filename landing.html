@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MRU Admissions Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #070c1a;
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Ambient blobs */
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: .3;
+            pointer-events: none;
+        }
+        .blob-1 { width: 500px; height: 500px; top: -150px; left: -100px; background: radial-gradient(circle, #1a2cff, transparent 70%); }
+        .blob-2 { width: 400px; height: 400px; bottom: -100px; right: -100px; background: radial-gradient(circle, #7c3aed, transparent 70%); }
+
+        .card {
+            position: relative;
+            z-index: 1;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 3rem 3.5rem;
+            text-align: center;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 8px 40px rgba(0,0,0,.5);
+        }
+
+        .logo {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, #00e5ff, #4f8dfd);
+            border-radius: 14px;
+            display: grid; place-items: center;
+            font-weight: 800; font-size: 1.1rem;
+            color: #070c1a;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 0 28px rgba(0,229,255,.25);
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: .5rem;
+        }
+
+        p {
+            color: #64748b;
+            font-size: .9rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: .5rem;
+            margin-bottom: 2rem;
+        }
+        .badge {
+            padding: .25rem .7rem;
+            border-radius: 20px;
+            font-size: .72rem;
+            font-weight: 600;
+        }
+        .b24 { background: rgba(0,229,255,.1); color: #00e5ff; border: 1px solid rgba(0,229,255,.2); }
+        .b25 { background: rgba(181,123,238,.1); color: #b57bee; border: 1px solid rgba(181,123,238,.2); }
+        .b26 { background: rgba(79,141,253,.1); color: #4f8dfd; border: 1px solid rgba(79,141,253,.2); }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .6rem;
+            background: linear-gradient(135deg, #00e5ff, #4f8dfd);
+            color: #070c1a;
+            font-family: 'Inter', sans-serif;
+            font-size: .95rem;
+            font-weight: 700;
+            padding: .85rem 2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: opacity .2s, transform .2s;
+            box-shadow: 0 0 24px rgba(0,229,255,.25);
+        }
+        .btn:hover { opacity: .9; transform: translateY(-2px); }
+        .btn svg { width: 18px; height: 18px; }
+
+        .footer {
+            margin-top: 1.5rem;
+            font-size: .75rem;
+            color: #334155;
+        }
+    </style>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="card">
+        <div class="logo">MR</div>
+        <h1>MRU Admissions Intelligence</h1>
+        <p>Advanced analytics dashboard comparing admissions data across three academic sessions.</p>
+
+        <div class="badges">
+            <span class="badge b24">2024–25</span>
+            <span class="badge b25">2025–26</span>
+            <span class="badge b26">2026–27</span>
+        </div>
+
+        <a href="https://vrfefavr-mru-admissions-dashboard.hf.space" target="_blank" class="btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Open Live Dashboard
+        </a>
+
+        <p class="footer">Manav Rachna University · Data as on 31 Oct</p>
+    </div>
+</body>
+</html>
