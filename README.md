@@ -1,11 +1,7 @@
 ---
 title: MRU Admissions Dashboard
-emoji: 📊
-colorFrom: blue
-colorTo: indigo
 sdk: docker
 app_file: app.py
-pinned: false
 ---
 
 # MRU Admissions Dashboard
@@ -47,14 +43,17 @@ Browser Display
 Two types of sheets in your Google Sheet:
 
 **Metadata Sheets:**
+
 - `Master Data-Date wise` - Time series (overall admissions per date)
 - `Master Data School-Datewise` - School aggregations
 
 **Date Snapshot Sheets:**
+
 - `1 JAN`, `15 Jan`, `31 Jan`, ..., `31 Oct` (existing)
 - `23 March`, `29 March` (new sheets auto-discovered!)
 
 Each date sheet contains:
+
 ```
 Program | School | 2024 Intake | 2024 Admissions | 2024 Withdrawals |
 2025 Intake | 2025 Admissions | 2025 Withdrawals |
@@ -64,6 +63,7 @@ Program | School | 2024 Intake | 2024 Admissions | 2024 Withdrawals |
 ## 🔧 Setup Instructions
 
 ### 1. Prerequisites
+
 - Python 3.9+
 - FastAPI, uvicorn, httpx
 - Google Sheets API credentials
@@ -78,6 +78,7 @@ Program | School | 2024 Intake | 2024 Admissions | 2024 Withdrawals |
 ### 3. Configure Environment Variables
 
 Create a `.env` file:
+
 ```
 GOOGLE_SHEET_ID=your_sheet_id_here
 GOOGLE_API_KEY=your_api_key_here
@@ -115,24 +116,24 @@ Visit: http://localhost:8000
 
 ## 🎨 Dashboard Pages
 
-| Page | Purpose |
-|------|---------|
-| **Overview** | KPIs, admission trajectory, growth rate, program mix |
-| **AI Insights** | Auto-generated analytics, alerts, forecasts |
-| **Trends & Growth** | Advanced trend analysis, growth rates, radar charts |
-| **Program Analysis** | Program-wise metrics, rankings, withdrawals |
-| **School Comparison** | School performance, capacity utilization, fill rates |
-| **Intake vs Fill Rate** | Capacity analysis, unmet demand, utilization |
+| Page                    | Purpose                                              |
+| ----------------------- | ---------------------------------------------------- |
+| **Overview**            | KPIs, admission trajectory, growth rate, program mix |
+| **AI Insights**         | Auto-generated analytics, alerts, forecasts          |
+| **Trends & Growth**     | Advanced trend analysis, growth rates, radar charts  |
+| **Program Analysis**    | Program-wise metrics, rankings, withdrawals          |
+| **School Comparison**   | School performance, capacity utilization, fill rates |
+| **Intake vs Fill Rate** | Capacity analysis, unmet demand, utilization         |
 
 ## 💻 Tech Stack
 
-| Component | Technology |
-|-----------|-----------|
-| Backend | FastAPI + Uvicorn |
-| Frontend | HTML5 + CSS3 + Vanilla JS |
-| Charts | Chart.js v4.4.0 |
-| Data Source | Google Sheets API |
-| Hosting | HuggingFace Spaces |
+| Component   | Technology                |
+| ----------- | ------------------------- |
+| Backend     | FastAPI + Uvicorn         |
+| Frontend    | HTML5 + CSS3 + Vanilla JS |
+| Charts      | Chart.js v4.4.0           |
+| Data Source | Google Sheets API         |
+| Hosting     | HuggingFace Spaces        |
 
 ## 📝 How It Works
 
@@ -147,6 +148,7 @@ Visit: http://localhost:8000
 ### New Sheet Detection
 
 When a teacher adds a new sheet (e.g., "23 March"):
+
 1. Backend's `get_sheet_names()` auto-discovers it
 2. Data is immediately available
 3. No code changes needed!
@@ -184,6 +186,7 @@ The dashboard automatically calculates:
 ## 📞 Support
 
 For issues or questions:
+
 1. Check the dashboard `/health` endpoint
 2. Verify Google Sheets API credentials
 3. Check HF Space logs if deployed
