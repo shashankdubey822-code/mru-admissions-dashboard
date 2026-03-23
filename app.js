@@ -24,24 +24,34 @@ Chart.defaults.plugins.datalabels.display = false; // off by default
 
 const gridColor = 'rgba(255,255,255,0.05)';
 
-// Year palette
-const COLORS = {
-    '2024': '#00e5ff',
-    '2025': '#b57bee',
-    '2026': '#4f8dfd',
-    green:  '#34d399',
-    rose:   '#fb7185',
-    amber:  '#fbbf24',
-    indigo: '#818cf8',
-};
-
-const SCHOOL_PALETTE = [
-    '#00e5ff','#b57bee','#4f8dfd','#34d399','#fb7185',
-    '#fbbf24','#818cf8','#f97316','#22d3ee','#a3e635'
-];
+// Removed hardcoded COLORS, SCHOOL_PALETTE, pages, pageTitles
+// These now come from DATA.config via backend
 
 let DATA = null; // global data store
 const activeCharts = {}; // chart instance registry
+
+// Helper functions to access config safely
+function getConfig() { return DATA?.config || {}; }
+function getYears() { return getConfig().years || [2024, 2025, 2026]; }
+function getYearLabel(year) { return getConfig().yearLabels?.[year] || `${year}`; }
+function getPages() { return getConfig().pages || ['overview', 'insights', 'trends', 'programs', 'schools', 'intake', 'editor']; }
+function getPageLabel(page) { return getConfig().pageLabels?.[page] || page; }
+function getSchools() { return getConfig().schools || []; }
+function getSchoolColor(schoolName) {
+    return getConfig().schools?.find(s => s.name === schoolName)?.color || '#94a3b8';
+}
+function getMonths() { return getConfig().months || ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]; }
+function getThreshold(key) { return getConfig().thresholds?.[key] ?? 0; }
+function getLimit(key) { return getConfig().ui?.limits?.[key] ?? 10; }
+function getTruncate(key) { return getConfig().ui?.truncateLimits?.[key] ?? 40; }
+function getAnimDuration(key) { return getConfig().ui?.animation?.[key] ?? 400; }
+function getPrecision(key) { return getConfig().ui?.precision?.[key] ?? 1; }
+
+// Legacy color getters for backward compatibility
+function getYearColor(year) {
+    const colors = { '2024': '#00e5ff', '2025': '#b57bee', '2026': '#4f8dfd' };
+    return colors[year] || '#94a3b8';
+}
 
 function hexA(hex, alpha) {
     const r = parseInt(hex.slice(1,3),16);
@@ -50,28 +60,20 @@ function hexA(hex, alpha) {
     return `rgba(${r},${g},${b},${alpha})`;
 }
 
+function getDefaultSchoolLabel() { return getConfig().ui?.defaultSchoolLabel || 'Unknown'; }
+
 // ============================================================
 // 1. NAVIGATION
 // ============================================================
 
-const pages = ['overview', 'insights', 'trends', 'programs', 'schools', 'intake', 'editor'];
-const pageTitles = {
-    overview: 'Overview',
-    insights: 'AI Insights',
-    trends:   'Trends & Growth',
-    programs: 'Program Analysis',
-    schools:  'School Comparison',
-    intake:   'Intake vs Fill Rate',
-    editor:   'Data Editor',
-};
-
 function navigateTo(pageId) {
+    const pages = getPages();
     pages.forEach(p => {
         document.getElementById(`page-${p}`).classList.toggle('active', p === pageId);
         document.getElementById(`nav-${p}`).classList.toggle('active', p === pageId);
     });
-    document.getElementById('pageTitle').textContent = pageTitles[pageId];
-    document.getElementById('pageBreadcrumb').textContent = `Dashboard → ${pageTitles[pageId]}`;
+    document.getElementById('pageTitle').textContent = getPageLabel(pageId);
+    document.getElementById('pageBreadcrumb').textContent = `Dashboard → ${getPageLabel(pageId)}`;
     window.scrollTo({ top: 0, behavior: 'smooth' });
     // Re-render active page so charts can size properly
     setTimeout(() => {
@@ -80,7 +82,7 @@ function navigateTo(pageId) {
         if (pageId === 'programs') renderProgramsPage();
         // Force resize all charts on this page
         Object.values(activeCharts).forEach(c => { try { c.resize(); } catch(e){} });
-    }, 80);
+    }, getAnimDuration('pageNav'));
 }
 
 function rebuildChart(id, config) {
@@ -113,7 +115,7 @@ async function boot() {
         }
         DATA = await res.json();
         loadDiv.style.opacity = 0;
-        setTimeout(() => loadDiv.remove(), 400);
+        setTimeout(() => loadDiv.remove(), getAnimDuration('loadingDelay'));
         init();
     } catch(e) {
         loadDiv.innerHTML = `<p style="color:#fb7185">Error loading data: ${e.message}</p>`;
@@ -233,7 +235,7 @@ function renderInsightsPage() {
     const total24 = progs.reduce((s, p) => s + p['2024'].admissions, 0);
     const total25 = progs.reduce((s, p) => s + p['2025'].admissions, 0);
     const yoyGrowth = total25 - total24;
-    const yoyGrowthPct = total24 > 0 ? ((total25/total24 - 1)*100).toFixed(1) : 0;
+    const yoyGrowthPct = total24 > 0 ? ((total25/total24 - 1)*100).toFixed(getPrecision("main")) : 0;
 
     let strengthsHtml = `
         <div class="insight-bullet">
@@ -262,7 +264,7 @@ function renderInsightsPage() {
             const gap = p['2025'].intake - p['2025'].admissions;
             const fillRate = (p['2025'].admissions / p['2025'].intake) * 100;
             if (gap > worstFillProg.gap) {
-                worstFillProg = { name: p.program, gap, fillRate: fillRate.toFixed(1) };
+                worstFillProg = { name: p.program, gap, fillRate: fillRate.toFixed(getPrecision("main")) };
             }
         }
     });
@@ -287,7 +289,7 @@ function renderInsightsPage() {
     const recentVelocity25 = (last30Days25[last30Days25.length-1] - last30Days25[0]) / 30;
     
     let forecastSentence = recentVelocity25 > 0 
-        ? `Admissions are pacing at a robust run-rate. Extrapolating the recent trajectory of <span class="highlight-var">+${recentVelocity25.toFixed(1)} students/day</span>, total 2025 volume is mathematically projected to <span class="highlight-good">comfortably exceed</span> the 2024 peak.`
+        ? `Admissions are pacing at a robust run-rate. Extrapolating the recent trajectory of <span class="highlight-var">+${recentVelocity25.toFixed(getPrecision("main"))} students/day</span>, total 2025 volume is mathematically projected to <span class="highlight-good">comfortably exceed</span> the 2024 peak.`
         : `Momentum has currently flat-lined. Admissions have slowed to <span class="highlight-bad">near zero</span> net growth per day. Strategic intervention is required if intake seats are heavily untendered within key programs.`;
 
     document.getElementById('insightForecast').innerHTML = `
@@ -326,7 +328,7 @@ function buildKPIs() {
 
     const totalIntake25 = progs.reduce((s, p) => s + p['2025'].intake, 0);
     const totalAdm25    = progs.reduce((s, p) => s + p['2025'].admissions, 0);
-    const fillRate25    = totalIntake25 > 0 ? ((totalAdm25 / totalIntake25) * 100).toFixed(1) : 0;
+    const fillRate25    = totalIntake25 > 0 ? ((totalAdm25 / totalIntake25) * 100).toFixed(getPrecision("main")) : 0;
     const totalWD25     = progs.reduce((s, p) => s + p['2025'].withdrawals, 0);
 
     const kpis = [
@@ -354,7 +356,7 @@ function buildKPIs() {
         const raw = el.dataset.target;
         const num = parseInt(raw.toString().replace(/\D/g,''));
         if (isNaN(num)) return;
-        animateCount(el, 0, num, 1400);
+        animateCount(el, 0, num, getAnimDuration('counterDuration'));
     });
 }
 
@@ -378,9 +380,9 @@ function buildOverviewTrend() {
         data: {
             labels,
             datasets: [
-                lineDS('2024-25', ts.map(d => d['2024']), COLORS['2024']),
-                lineDS('2025-26', ts.map(d => d['2025']), COLORS['2025']),
-                lineDS('2026-27', ts.map(d => d['2026']), COLORS['2026']),
+                lineDS('2024-25', ts.map(d => d['2024']), getYearColor('2024')),
+                lineDS('2025-26', ts.map(d => d['2025']), getYearColor('2025')),
+                lineDS('2026-27', ts.map(d => d['2026']), getYearColor('2026')),
             ]
         },
         options: lineOpts({ maintainAspectRatio: false })
@@ -398,7 +400,7 @@ function buildYoYChart() {
             datasets: [{
                 label: '2025 vs 2024 Delta',
                 data: delta,
-                backgroundColor: delta.map(v => v >= 0 ? hexA(COLORS.green, 0.75) : hexA(COLORS.rose, 0.75)),
+                backgroundColor: delta.map(v => v >= 0 ? hexA('#34d399', 0.75) : hexA('#fb7185', 0.75)),
                 borderRadius: 4,
                 borderSkipped: false,
             }]
@@ -425,7 +427,7 @@ function buildCategoryDonut() {
             labels,
             datasets: [{
                 data: vals,
-                backgroundColor: labels.map((_, i) => SCHOOL_PALETTE[i % SCHOOL_PALETTE.length]),
+                backgroundColor: labels.map((_, i) => getSchools()[i % getSchools().length]?.color || "#94a3b8"),
                 hoverOffset: 8,
                 borderColor: 'rgba(7,12,26,.8)',
                 borderWidth: 2,
@@ -462,8 +464,8 @@ function buildVelocityChart() {
         data: {
             labels,
             datasets: [
-                { label: '2024', data: vel24, backgroundColor: hexA(COLORS['2024'], 0.7), borderRadius: 3, borderSkipped: false },
-                { label: '2025', data: vel25, backgroundColor: hexA(COLORS['2025'], 0.7), borderRadius: 3, borderSkipped: false }
+                { label: '2024', data: vel24, backgroundColor: hexA(getYearColor('2024'), 0.7), borderRadius: 3, borderSkipped: false },
+                { label: '2025', data: vel25, backgroundColor: hexA(getYearColor('2025'), 0.7), borderRadius: 3, borderSkipped: false }
             ]
         },
         options: {
@@ -483,7 +485,7 @@ function buildFillRateOverview() {
     const labels = Object.keys(cats);
     const fillRates = labels.map(l => {
         const c = cats[l];
-        return c.intake_2025 > 0 ? parseFloat((c.admissions_2025 / c.intake_2025 * 100).toFixed(1)) : 0;
+        return c.intake_2025 > 0 ? parseFloat((c.admissions_2025 / c.intake_2025 * 100).toFixed(getPrecision("main"))) : 0;
     });
     rebuildChart('fillRateOverview', {
         type: 'bar',
@@ -492,7 +494,7 @@ function buildFillRateOverview() {
             datasets: [{
                 label: 'Fill Rate % (2025)',
                 data: fillRates,
-                backgroundColor: fillRates.map(v => v >= 70 ? hexA(COLORS.green, 0.75) : v >= 40 ? hexA(COLORS.amber, 0.75) : hexA(COLORS.rose, 0.75)),
+                backgroundColor: fillRates.map(v => v >= 70 ? hexA('#34d399', 0.75) : v >= 40 ? hexA('#fbbf24', 0.75) : hexA('#fb7185', 0.75)),
                 borderRadius: 5,
                 borderSkipped: false,
             }]
@@ -530,9 +532,9 @@ function buildFullTrend() {
         data: {
             labels,
             datasets: [
-                lineDS('Session 2024-25', ts.map(d => d['2024']), COLORS['2024']),
-                lineDS('Session 2025-26', ts.map(d => d['2025']), COLORS['2025']),
-                lineDS('Session 2026-27', ts.map(d => d['2026']), COLORS['2026']),
+                lineDS('Session 2024-25', ts.map(d => d['2024']), getYearColor('2024')),
+                lineDS('Session 2025-26', ts.map(d => d['2025']), getYearColor('2025')),
+                lineDS('Session 2026-27', ts.map(d => d['2026']), getYearColor('2026')),
             ]
         },
         options: lineOpts({ maintainAspectRatio: false, fillMode: true })
@@ -544,15 +546,15 @@ function buildGrowthRate() {
     const labels = ts.slice(1).map(d => d.date);
     const base24 = ts[0]['2024'] || 1;
     const base25 = ts[0]['2025'] || 1;
-    const gr24 = ts.slice(1).map(d => +((d['2024'] / base24 - 1) * 100).toFixed(1));
-    const gr25 = ts.slice(1).map(d => +((d['2025'] / base25 - 1) * 100).toFixed(1));
+    const gr24 = ts.slice(1).map(d => +((d['2024'] / base24 - 1) * 100).toFixed(getPrecision("main")));
+    const gr25 = ts.slice(1).map(d => +((d['2025'] / base25 - 1) * 100).toFixed(getPrecision("main")));
     rebuildChart('growthRateChart', {
         type: 'line',
         data: {
             labels,
             datasets: [
-                lineDS('2024 Growth %', gr24, COLORS['2024'], false),
-                lineDS('2025 Growth %', gr25, COLORS['2025'], false),
+                lineDS('2024 Growth %', gr24, getYearColor('2024'), false),
+                lineDS('2025 Growth %', gr25, getYearColor('2025'), false),
             ]
         },
         options: lineOpts({ maintainAspectRatio: false, yLabel: '%' })
@@ -570,8 +572,8 @@ function buildAcceleration() {
         data: {
             labels,
             datasets: [
-                { label: '2024 Acceleration', data: acc24, backgroundColor: hexA(COLORS['2024'], 0.65), borderRadius: 3, borderSkipped: false },
-                { label: '2025 Acceleration', data: acc25, backgroundColor: hexA(COLORS['2025'], 0.65), borderRadius: 3, borderSkipped: false },
+                { label: '2024 Acceleration', data: acc24, backgroundColor: hexA(getYearColor('2024'), 0.65), borderRadius: 3, borderSkipped: false },
+                { label: '2025 Acceleration', data: acc25, backgroundColor: hexA(getYearColor('2025'), 0.65), borderRadius: 3, borderSkipped: false },
             ]
         },
         options: {
@@ -589,8 +591,8 @@ function buildRadarChart() {
         data: {
             labels: ts.map(d => d.date),
             datasets: [
-                { label: '2024', data: ts.map(d => d['2024']), borderColor: COLORS['2024'], backgroundColor: hexA(COLORS['2024'], 0.15), pointBackgroundColor: COLORS['2024'], borderWidth: 2 },
-                { label: '2025', data: ts.map(d => d['2025']), borderColor: COLORS['2025'], backgroundColor: hexA(COLORS['2025'], 0.15), pointBackgroundColor: COLORS['2025'], borderWidth: 2 },
+                { label: '2024', data: ts.map(d => d['2024']), borderColor: getYearColor('2024'), backgroundColor: hexA(getYearColor('2024'), 0.15), pointBackgroundColor: getYearColor('2024'), borderWidth: 2 },
+                { label: '2025', data: ts.map(d => d['2025']), borderColor: getYearColor('2025'), backgroundColor: hexA(getYearColor('2025'), 0.15), pointBackgroundColor: getYearColor('2025'), borderWidth: 2 },
             ]
         },
         options: {
@@ -609,7 +611,7 @@ function buildRadarChart() {
 
 function buildPeakComp() {
     const ts = DATA.time_series;
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct'];
+    const months = getMonths().slice(0, 10);
     const byMonth24 = months.map(m => Math.max(...ts.filter(d => d.date.includes(m)).map(d => d['2024']), 0));
     const byMonth25 = months.map(m => Math.max(...ts.filter(d => d.date.includes(m)).map(d => d['2025']), 0));
     rebuildChart('peakCompChart', {
@@ -617,8 +619,8 @@ function buildPeakComp() {
         data: {
             labels: months,
             datasets: [
-                { label: '2024 Peak', data: byMonth24, backgroundColor: hexA(COLORS['2024'], 0.7), borderRadius: 4, borderSkipped: false },
-                { label: '2025 Peak', data: byMonth25, backgroundColor: hexA(COLORS['2025'], 0.7), borderRadius: 4, borderSkipped: false },
+                { label: '2024 Peak', data: byMonth24, backgroundColor: hexA(getYearColor('2024'), 0.7), borderRadius: 4, borderSkipped: false },
+                { label: '2025 Peak', data: byMonth25, backgroundColor: hexA(getYearColor('2025'), 0.7), borderRadius: 4, borderSkipped: false },
             ]
         },
         options: {
@@ -660,9 +662,9 @@ function buildProgramBar(progs, year, metric) {
         data: {
             labels,
             datasets: [
-                { label: '2024', data: d24, backgroundColor: hexA(COLORS['2024'], 0.75), borderRadius: 3, borderSkipped: false },
-                { label: '2025', data: d25, backgroundColor: hexA(COLORS['2025'], 0.85), borderRadius: 3, borderSkipped: false },
-                { label: '2026', data: d26, backgroundColor: hexA(COLORS['2026'], 0.85), borderRadius: 3, borderSkipped: false },
+                { label: '2024', data: d24, backgroundColor: hexA(getYearColor('2024'), 0.75), borderRadius: 3, borderSkipped: false },
+                { label: '2025', data: d25, backgroundColor: hexA(getYearColor('2025'), 0.85), borderRadius: 3, borderSkipped: false },
+                { label: '2026', data: d26, backgroundColor: hexA(getYearColor('2026'), 0.85), borderRadius: 3, borderSkipped: false },
             ]
         },
         options: {
@@ -674,7 +676,7 @@ function buildProgramBar(progs, year, metric) {
 }
 
 function buildTop10(progs, year) {
-    const sorted = [...progs].sort((a, b) => (b[year].admissions || 0) - (a[year].admissions || 0)).slice(0, 10);
+    const sorted = [...progs].sort((a, b) => (b[year].admissions || 0) - (a[year].admissions || 0)).slice(0, getLimit("topPrograms"));
     const labels = sorted.map(p => p.program.length > 25 ? p.program.slice(0,25)+'…' : p.program);
     const vals = sorted.map(p => p[year].admissions || 0);
     rebuildChart('top10Chart', {
@@ -684,7 +686,7 @@ function buildTop10(progs, year) {
             datasets: [{
                 label: `Admissions ${year}`,
                 data: vals,
-                backgroundColor: vals.map((_, i) => SCHOOL_PALETTE[i % SCHOOL_PALETTE.length]),
+                backgroundColor: vals.map((_, i) => getSchools()[i % getSchools().length]?.color || "#94a3b8"),
                 borderRadius: 5,
                 borderSkipped: false,
             }]
@@ -714,8 +716,8 @@ function buildCatComp(progs) {
         data: {
             labels,
             datasets: [
-                { label: 'Intake 2025', data: labels.map(l => cats[l].intake25), backgroundColor: hexA(COLORS['2025'], 0.45), borderRadius: 4 },
-                { label: 'Admissions 2025', data: labels.map(l => cats[l].adm25), backgroundColor: hexA(COLORS['2025'], 0.85), borderRadius: 4 },
+                { label: 'Intake 2025', data: labels.map(l => cats[l].intake25), backgroundColor: hexA(getYearColor('2025'), 0.45), borderRadius: 4 },
+                { label: 'Admissions 2025', data: labels.map(l => cats[l].adm25), backgroundColor: hexA(getYearColor('2025'), 0.85), borderRadius: 4 },
             ]
         },
         options: {
@@ -727,7 +729,7 @@ function buildCatComp(progs) {
 }
 
 function buildWithdrawals(progs, year) {
-    const sorted = [...progs].sort((a, b) => (b[year].withdrawals || 0) - (a[year].withdrawals || 0)).filter(p => (p[year].withdrawals || 0) > 0).slice(0, 15);
+    const sorted = [...progs].sort((a, b) => (b[year].withdrawals || 0) - (a[year].withdrawals || 0)).filter(p => (p[year].withdrawals || 0) > 0).slice(0, getLimit("topWithdrawals"));
     const labels = sorted.map(p => p.program.length > 28 ? p.program.slice(0,28)+'…' : p.program);
     const vals = sorted.map(p => p[year].withdrawals || 0);
     rebuildChart('withdrawalChart', {
@@ -737,7 +739,7 @@ function buildWithdrawals(progs, year) {
             datasets: [{
                 label: `Withdrawals ${year}`,
                 data: vals,
-                backgroundColor: hexA(COLORS.rose, 0.75),
+                backgroundColor: hexA('#fb7185', 0.75),
                 borderRadius: 5,
                 borderSkipped: false,
             }]
@@ -762,7 +764,7 @@ function buildProgramStatus(progs) {
             labels: ['Continued (2024→2026)', 'New in 2026', 'Discontinued by 2026', 'Only in 2025'],
             datasets: [{
                 data: [continued, newProgs, discontinued, newIn2025],
-                backgroundColor: [hexA(COLORS.green, 0.8), hexA(COLORS.blue, 0.8), hexA(COLORS.rose, 0.8), hexA(COLORS.amber, 0.8)],
+                backgroundColor: [hexA('#34d399', 0.8), hexA('#22d3ee', 0.8), hexA('#fb7185', 0.8), hexA('#fbbf24', 0.8)],
                 borderColor: 'rgba(7,12,26,.8)',
                 borderWidth: 2,
                 hoverOffset: 8,
@@ -793,16 +795,16 @@ function renderSchoolsPage() {
     // Aggregate by school
     const schools = {};
     progs.forEach(p => {
-        const s = p.school || 'Unknown';
+        const s = p.school || getDefaultSchoolLabel();
         if (!schools[s]) schools[s] = { intake24:0, intake25:0, intake26:0, adm24:0, adm25:0, adm26:0, wd24:0, wd25:0, wd26:0 };
         const sc = schools[s];
         sc.intake24 += p['2024'].intake; sc.adm24 += p['2024'].admissions; sc.wd24 += p['2024'].withdrawals;
         sc.intake25 += p['2025'].intake; sc.adm25 += p['2025'].admissions; sc.wd25 += p['2025'].withdrawals;
         sc.intake26 += p['2026'].intake; sc.adm26 += p['2026'].admissions; sc.wd26 += p['2026'].withdrawals;
     });
-    const labels = Object.keys(schools).filter(k => k !== 'Unknown' && (schools[k].intake24 + schools[k].intake25 + schools[k].intake26) > 0);
+    const labels = Object.keys(schools).filter(k => k !== getDefaultSchoolLabel() && (schools[k].intake24 + schools[k].intake25 + schools[k].intake26) > 0);
     const sc = labels.map(l => schools[l]);
-    const colors = SCHOOL_PALETTE;
+    const colors = getSchools().map(s => s.color);
 
     // School Bar
     rebuildChart('schoolBarChart', {
@@ -810,9 +812,9 @@ function renderSchoolsPage() {
         data: {
             labels,
             datasets: [
-                { label: '2024', data: sc.map(s => s.adm24), backgroundColor: hexA(COLORS['2024'], 0.75), borderRadius: 4, borderSkipped: false },
-                { label: '2025', data: sc.map(s => s.adm25), backgroundColor: hexA(COLORS['2025'], 0.75), borderRadius: 4, borderSkipped: false },
-                { label: '2026', data: sc.map(s => s.adm26), backgroundColor: hexA(COLORS['2026'], 0.75), borderRadius: 4, borderSkipped: false },
+                { label: '2024', data: sc.map(s => s.adm24), backgroundColor: hexA(getYearColor('2024'), 0.75), borderRadius: 4, borderSkipped: false },
+                { label: '2025', data: sc.map(s => s.adm25), backgroundColor: hexA(getYearColor('2025'), 0.75), borderRadius: 4, borderSkipped: false },
+                { label: '2026', data: sc.map(s => s.adm26), backgroundColor: hexA(getYearColor('2026'), 0.75), borderRadius: 4, borderSkipped: false },
             ]
         },
         options: {
@@ -852,7 +854,7 @@ function renderSchoolsPage() {
         type: 'radar',
         data: {
             labels: ['Intake 2024', 'Admissions 2024', 'Intake 2025', 'Admissions 2025', 'Intake 2026', 'Withdrawals'],
-            datasets: labels.slice(0, 6).map((l, i) => ({
+            datasets: labels.slice(0, getLimit("radarSchools")).map((l, i) => ({
                 label: l,
                 data: [sc[i].intake24, sc[i].adm24, sc[i].intake25, sc[i].adm25, sc[i].intake26, sc[i].wd25],
                 borderColor: colors[i % colors.length],
@@ -870,17 +872,17 @@ function renderSchoolsPage() {
 
     // Fill Rate chart
     const fillLabels = labels;
-    const fill24 = sc.map(s => s.intake24 > 0 ? +(s.adm24 / s.intake24 * 100).toFixed(1) : 0);
-    const fill25 = sc.map(s => s.intake25 > 0 ? +(s.adm25 / s.intake25 * 100).toFixed(1) : 0);
-    const fill26 = sc.map(s => s.intake26 > 0 ? +(s.adm26 / s.intake26 * 100).toFixed(1) : 0);
+    const fill24 = sc.map(s => s.intake24 > 0 ? +(s.adm24 / s.intake24 * 100).toFixed(getPrecision("main")) : 0);
+    const fill25 = sc.map(s => s.intake25 > 0 ? +(s.adm25 / s.intake25 * 100).toFixed(getPrecision("main")) : 0);
+    const fill26 = sc.map(s => s.intake26 > 0 ? +(s.adm26 / s.intake26 * 100).toFixed(getPrecision("main")) : 0);
     rebuildChart('schoolFillChart', {
         type: 'bar',
         data: {
             labels: fillLabels,
             datasets: [
-                { label: '2024 Fill%', data: fill24, backgroundColor: hexA(COLORS['2024'], 0.7), borderRadius: 4, borderSkipped: false },
-                { label: '2025 Fill%', data: fill25, backgroundColor: hexA(COLORS['2025'], 0.7), borderRadius: 4, borderSkipped: false },
-                { label: '2026 Fill%', data: fill26, backgroundColor: hexA(COLORS['2026'], 0.7), borderRadius: 4, borderSkipped: false },
+                { label: '2024 Fill%', data: fill24, backgroundColor: hexA(getYearColor('2024'), 0.7), borderRadius: 4, borderSkipped: false },
+                { label: '2025 Fill%', data: fill25, backgroundColor: hexA(getYearColor('2025'), 0.7), borderRadius: 4, borderSkipped: false },
+                { label: '2026 Fill%', data: fill26, backgroundColor: hexA(getYearColor('2026'), 0.7), borderRadius: 4, borderSkipped: false },
             ]
         },
         options: {
@@ -899,8 +901,8 @@ function renderSchoolsPage() {
         data: {
             labels,
             datasets: [
-                { label: '2024 Withdrawals', data: sc.map(s => s.wd24), backgroundColor: hexA(COLORS.rose, 0.55), borderRadius: 3, borderSkipped: false },
-                { label: '2025 Withdrawals', data: sc.map(s => s.wd25), backgroundColor: hexA(COLORS.rose, 0.85), borderRadius: 3, borderSkipped: false },
+                { label: '2024 Withdrawals', data: sc.map(s => s.wd24), backgroundColor: hexA('#fb7185', 0.55), borderRadius: 3, borderSkipped: false },
+                { label: '2025 Withdrawals', data: sc.map(s => s.wd25), backgroundColor: hexA('#fb7185', 0.85), borderRadius: 3, borderSkipped: false },
             ]
         },
         options: {
@@ -926,9 +928,9 @@ function renderIntakePage() {
     const totalAdm25    = progs.reduce((s, p) => s + p['2025'].admissions, 0);
     const totalAdm26    = progs.reduce((s, p) => s + p['2026'].admissions, 0);
 
-    animateCount(document.getElementById('totalIntake2024'), 0, totalIntake24, 1400);
-    animateCount(document.getElementById('totalIntake2025'), 0, totalIntake25, 1400);
-    animateCount(document.getElementById('totalIntake2026'), 0, totalIntake26, 1400);
+    animateCount(document.getElementById('totalIntake2024'), 0, totalIntake24, getAnimDuration('counterDuration'));
+    animateCount(document.getElementById('totalIntake2025'), 0, totalIntake25, getAnimDuration('counterDuration'));
+    animateCount(document.getElementById('totalIntake2026'), 0, totalIntake26, getAnimDuration('counterDuration'));
 
     // Intake vs Admissions grouped bar
     const cats = {};
@@ -946,12 +948,12 @@ function renderIntakePage() {
         data: {
             labels: catLabels,
             datasets: [
-                { label: 'Intake 2024',      data: catLabels.map(l => cats[l].i24), backgroundColor: hexA(COLORS['2024'], 0.3), borderRadius: 4, borderSkipped: false },
-                { label: 'Admissions 2024',  data: catLabels.map(l => cats[l].a24), backgroundColor: hexA(COLORS['2024'], 0.85), borderRadius: 4, borderSkipped: false },
-                { label: 'Intake 2025',      data: catLabels.map(l => cats[l].i25), backgroundColor: hexA(COLORS['2025'], 0.3), borderRadius: 4, borderSkipped: false },
-                { label: 'Admissions 2025',  data: catLabels.map(l => cats[l].a25), backgroundColor: hexA(COLORS['2025'], 0.85), borderRadius: 4, borderSkipped: false },
-                { label: 'Intake 2026',      data: catLabels.map(l => cats[l].i26), backgroundColor: hexA(COLORS['2026'], 0.3), borderRadius: 4, borderSkipped: false },
-                { label: 'Admissions 2026',  data: catLabels.map(l => cats[l].a26), backgroundColor: hexA(COLORS['2026'], 0.85), borderRadius: 4, borderSkipped: false },
+                { label: 'Intake 2024',      data: catLabels.map(l => cats[l].i24), backgroundColor: hexA(getYearColor('2024'), 0.3), borderRadius: 4, borderSkipped: false },
+                { label: 'Admissions 2024',  data: catLabels.map(l => cats[l].a24), backgroundColor: hexA(getYearColor('2024'), 0.85), borderRadius: 4, borderSkipped: false },
+                { label: 'Intake 2025',      data: catLabels.map(l => cats[l].i25), backgroundColor: hexA(getYearColor('2025'), 0.3), borderRadius: 4, borderSkipped: false },
+                { label: 'Admissions 2025',  data: catLabels.map(l => cats[l].a25), backgroundColor: hexA(getYearColor('2025'), 0.85), borderRadius: 4, borderSkipped: false },
+                { label: 'Intake 2026',      data: catLabels.map(l => cats[l].i26), backgroundColor: hexA(getYearColor('2026'), 0.3), borderRadius: 4, borderSkipped: false },
+                { label: 'Admissions 2026',  data: catLabels.map(l => cats[l].a26), backgroundColor: hexA(getYearColor('2026'), 0.85), borderRadius: 4, borderSkipped: false },
             ]
         },
         options: {
@@ -962,16 +964,16 @@ function renderIntakePage() {
     });
 
     // Fill Rate Gauge-style polar chart
-    const fill24 = totalIntake24 > 0 ? +(totalAdm24 / totalIntake24 * 100).toFixed(1) : 0;
-    const fill25 = totalIntake25 > 0 ? +(totalAdm25 / totalIntake25 * 100).toFixed(1) : 0;
-    const fill26 = totalIntake26 > 0 ? +(totalAdm26 / totalIntake26 * 100).toFixed(1) : 0;
+    const fill24 = totalIntake24 > 0 ? +(totalAdm24 / totalIntake24 * 100).toFixed(getPrecision("main")) : 0;
+    const fill25 = totalIntake25 > 0 ? +(totalAdm25 / totalIntake25 * 100).toFixed(getPrecision("main")) : 0;
+    const fill26 = totalIntake26 > 0 ? +(totalAdm26 / totalIntake26 * 100).toFixed(getPrecision("main")) : 0;
     rebuildChart('fillRateGaugeChart', {
         type: 'polarArea',
         data: {
             labels: ['Fill Rate 2024', 'Fill Rate 2025', 'Fill Rate 2026'],
             datasets: [{
                 data: [fill24, fill25, fill26],
-                backgroundColor: [hexA(COLORS['2024'], 0.7), hexA(COLORS['2025'], 0.7), hexA(COLORS['2026'], 0.7)],
+                backgroundColor: [hexA(getYearColor('2024'), 0.7), hexA(getYearColor('2025'), 0.7), hexA(getYearColor('2026'), 0.7)],
                 borderColor: 'rgba(7,12,26,.6)',
                 borderWidth: 2,
             }]
@@ -992,21 +994,21 @@ function renderIntakePage() {
     // Bubble chart — school level (intake vs adm, bubble = withdrawals)
     const schools = {};
     progs.forEach(p => {
-        const s = p.school || 'Unknown';
+        const s = p.school || getDefaultSchoolLabel();
         if (!schools[s]) schools[s] = { intake25:0, adm25:0, wd25:0 };
         schools[s].intake25 += p['2025'].intake;
         schools[s].adm25    += p['2025'].admissions;
         schools[s].wd25     += p['2025'].withdrawals;
     });
-    const schoolNames = Object.keys(schools).filter(k => k !== 'Unknown' && schools[k].intake25 > 0);
+    const schoolNames = Object.keys(schools).filter(k => k !== getDefaultSchoolLabel() && schools[k].intake25 > 0);
     rebuildChart('bubbleChart', {
         type: 'bubble',
         data: {
             datasets: schoolNames.map((name, i) => ({
                 label: name,
                 data: [{ x: schools[name].intake25, y: schools[name].adm25, r: Math.max(5, Math.sqrt(schools[name].wd25 + 1) * 5) }],
-                backgroundColor: hexA(SCHOOL_PALETTE[i % SCHOOL_PALETTE.length], 0.7),
-                borderColor: SCHOOL_PALETTE[i % SCHOOL_PALETTE.length],
+                backgroundColor: hexA(getSchools()[i % getSchools().length]?.color || "#94a3b8", 0.7),
+                borderColor: getSchools()[i % getSchools().length]?.color || "#94a3b8",
                 borderWidth: 1.5,
             }))
         },
@@ -1029,7 +1031,7 @@ function renderIntakePage() {
     const gaps = progs
         .map(p => ({ name: p.program, gap: p['2025'].intake - p['2025'].admissions, intake: p['2025'].intake }))
         .filter(p => p.gap > 50 && p.intake > 0)
-        .sort((a, b) => b.gap - a.gap).slice(0, 12);
+        .sort((a, b) => b.gap - a.gap).slice(0, getLimit("topGaps"));
 
     const gLabels = gaps.map(g => g.name.length > 30 ? g.name.slice(0, 30)+'…' : g.name);
     rebuildChart('gapChart', {
@@ -1037,8 +1039,8 @@ function renderIntakePage() {
         data: {
             labels: gLabels,
             datasets: [
-                { label: 'Intake 2025', data: gaps.map(g => g.intake), backgroundColor: hexA(COLORS.amber, 0.5), borderRadius:4, borderSkipped:false },
-                { label: 'Admissions 2025', data: gaps.map(g => g.intake - g.gap), backgroundColor: hexA(COLORS.green, 0.75), borderRadius:4, borderSkipped:false },
+                { label: 'Intake 2025', data: gaps.map(g => g.intake), backgroundColor: hexA('#fbbf24', 0.5), borderRadius:4, borderSkipped:false },
+                { label: 'Admissions 2025', data: gaps.map(g => g.intake - g.gap), backgroundColor: hexA('#34d399', 0.75), borderRadius:4, borderSkipped:false },
             ]
         },
         options: {
@@ -1054,9 +1056,9 @@ function renderIntakePage() {
         data: {
             labels: catLabels,
             datasets: [
-                { label: 'Intake 2024', data: catLabels.map(l => cats[l].i24), backgroundColor: hexA(COLORS['2024'], 0.7), borderRadius:4, borderSkipped:false },
-                { label: 'Intake 2025', data: catLabels.map(l => cats[l].i25), backgroundColor: hexA(COLORS['2025'], 0.7), borderRadius:4, borderSkipped:false },
-                { label: 'Intake 2026', data: catLabels.map(l => cats[l].i26), backgroundColor: hexA(COLORS['2026'], 0.7), borderRadius:4, borderSkipped:false },
+                { label: 'Intake 2024', data: catLabels.map(l => cats[l].i24), backgroundColor: hexA(getYearColor('2024'), 0.7), borderRadius:4, borderSkipped:false },
+                { label: 'Intake 2025', data: catLabels.map(l => cats[l].i25), backgroundColor: hexA(getYearColor('2025'), 0.7), borderRadius:4, borderSkipped:false },
+                { label: 'Intake 2026', data: catLabels.map(l => cats[l].i26), backgroundColor: hexA(getYearColor('2026'), 0.7), borderRadius:4, borderSkipped:false },
             ]
         },
         options: {

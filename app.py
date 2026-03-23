@@ -225,10 +225,78 @@ async def get_data():
             c["intake_2026"]     += p["2026"]["intake"]
             c["admissions_2026"] += p["2026"]["admissions"]
 
+    from datetime import datetime
+
     return {
         "time_series":       time_series,
         "faculty_breakdown": faculty_breakdown,
         "program_categories": program_categories,
+        "config": {
+            "years": [2024, 2025, 2026],
+            "yearLabels": {
+                "2024": "2024–25",
+                "2025": "2025–26",
+                "2026": "2026–27"
+            },
+            "months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+            "currentDate": time_series[-1]["date"] if time_series else "N/A",
+            "schools": [
+                {"name": "MRSoE", "color": "#FF6B6B", "labelEn": "School of Engineering"},
+                {"name": "MRSoM&C", "color": "#4ECDC4", "labelEn": "School of Management & Commerce"},
+                {"name": "MRSoS", "color": "#FFE66D", "labelEn": "School of Sciences"},
+                {"name": "MRSoE&H", "color": "#95E1D3", "labelEn": "School of Education & Humanities"},
+                {"name": "MRSoL", "color": "#A8D8EA", "labelEn": "School of Law"}
+            ],
+            "pages": ["overview", "insights", "trends", "programs", "schools", "intake", "editor"],
+            "pageLabels": {
+                "overview": "Overview",
+                "insights": "AI Insights",
+                "trends": "Trends",
+                "programs": "Programs",
+                "schools": "Schools",
+                "intake": "Intake Analysis",
+                "editor": "Data Editor"
+            },
+            "thresholds": {
+                "intakeConcern": 20,
+                "fillRateHigh": 70,
+                "fillRateMedium": 40,
+                "gapThreshold": 50
+            },
+            "ui": {
+                "truncateLimits": {
+                    "program": 40,
+                    "programShort": 25,
+                    "school": 28,
+                    "gap": 30
+                },
+                "limits": {
+                    "topPrograms": 10,
+                    "topWithdrawals": 15,
+                    "radarSchools": 6,
+                    "topGaps": 12
+                },
+                "animation": {
+                    "pageNav": 80,
+                    "loadingDelay": 400,
+                    "counterDuration": 1400
+                },
+                "precision": {
+                    "main": 1,
+                    "percentage": 1
+                },
+                "defaultSchoolLabel": "Unknown"
+            },
+            "language": "en",
+            "strings": {
+                "totalIntake": {"en": "Total Intake"},
+                "netAdmissions": {"en": "Net Admissions"},
+                "withdrawals": {"en": "Withdrawals"},
+                "intakeRate": {"en": "Intake Rate"},
+                "fillRate": {"en": "Fill Rate"},
+                "unmetDemand": {"en": "Unmet Demand"}
+            }
+        }
     }
 
 
