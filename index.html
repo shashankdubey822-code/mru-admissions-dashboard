@@ -1,544 +1,846 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title id="pageTitle_head">MRU Admissions Intelligence</title>
-    <meta name="description" content="Advanced Admissions Analytics Dashboard for Manav Rachna University — automated analysis from live data.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta
+      name="description"
+      content="Advanced Admissions Analytics Dashboard for Manav Rachna University — automated analysis from live data."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <!-- Ambient Background Blobs -->
     <div class="ambient-bg">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
     </div>
 
     <!-- Sidebar Navigation -->
     <nav class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="brand-logo">
-                <div class="logo-icon">MR</div>
-                <div class="brand-text">
-                    <span class="brand-title">MRU Analytics</span>
-                    <span class="brand-subtitle" id="brandSubtitle">Loading...</span>
-                </div>
-            </div>
+      <div class="sidebar-header">
+        <div class="brand-logo">
+          <div class="logo-icon">MR</div>
+          <div class="brand-text">
+            <span class="brand-title">MRU Analytics</span>
+            <span class="brand-subtitle" id="brandSubtitle">Loading...</span>
+          </div>
         </div>
+      </div>
 
-        <div class="nav-section-label">Main</div>
-        <ul class="nav-links">
-            <li><a href="#" class="nav-item active" data-page="overview" id="nav-overview">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-                Overview
-            </a></li>
-            <li><a href="#" class="nav-item" data-page="insights" id="nav-insights">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                AI Insights
-            </a></li>
-            <li><a href="#" class="nav-item" data-page="trends" id="nav-trends">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                Trends & Growth
-            </a></li>
-            <li><a href="#" class="nav-item" data-page="programs" id="nav-programs">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                Program Analysis
-            </a></li>
-            <li><a href="#" class="nav-item" data-page="schools" id="nav-schools">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 17 22 12"/></svg>
-                School Comparison
-            </a></li>
-            <li><a href="#" class="nav-item" data-page="intake" id="nav-intake">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                Intake vs Fill Rate
-            </a></li>
-            <li><a href="#" class="nav-item" data-page="editor" id="nav-editor">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                Data Editor
-            </a></li>
-        </ul>
+      <div class="nav-section-label">Main</div>
+      <ul class="nav-links">
+        <li>
+          <a
+            href="#"
+            class="nav-item active"
+            data-page="overview"
+            id="nav-overview"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+            </svg>
+            Overview
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-item" data-page="insights" id="nav-insights">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polygon
+                points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"
+              ></polygon>
+            </svg>
+            AI Insights
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-item" data-page="trends" id="nav-trends">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+            Trends & Growth
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-item" data-page="programs" id="nav-programs">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+              />
+            </svg>
+            Program Analysis
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-item" data-page="schools" id="nav-schools">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polygon points="12 2 2 7 12 12 22 7 12 2" />
+              <polyline points="2 17 12 22 22 17" />
+              <polyline points="2 12 17 22 12" />
+            </svg>
+            School Comparison
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-item" data-page="intake" id="nav-intake">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            Intake vs Fill Rate
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-item" data-page="editor" id="nav-editor">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+              />
+              <path
+                d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+              />
+            </svg>
+            Data Editor
+          </a>
+        </li>
+      </ul>
 
-        <div class="sidebar-footer">
-            <div class="data-freshness">
-                <span class="dot-live"></span>
-                Data as on: <span id="currentDate">—</span>
-            </div>
+      <div class="sidebar-footer">
+        <div class="data-freshness">
+          <span class="dot-live"></span>
+          Data as on: <span id="currentDate">—</span>
         </div>
+      </div>
     </nav>
 
     <!-- Main Content Area -->
     <div class="main-wrapper">
-        <!-- Topbar -->
-        <header class="topbar glass-card">
-            <div class="topbar-left">
-                <button class="menu-toggle" id="menuToggle" aria-label="Toggle sidebar">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                </button>
+      <!-- Topbar -->
+      <header class="topbar glass-card">
+        <div class="topbar-left">
+          <button
+            class="menu-toggle"
+            id="menuToggle"
+            aria-label="Toggle sidebar"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+          <div>
+            <h1 class="page-title" id="pageTitle">Overview</h1>
+            <p class="page-breadcrumb" id="pageBreadcrumb">
+              Dashboard → Overview
+            </p>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="search-box">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search programs..."
+              class="search-input"
+            />
+            <span class="search-icon">🔍</span>
+          </div>
+          <button
+            class="refresh-btn"
+            id="refreshBtn"
+            title="Refresh data from Google Sheets"
+          >
+            ↻ Refresh Data
+          </button>
+          <div class="year-badges" id="yearBadges">
+            <!-- Generated by JS from config -->
+          </div>
+        </div>
+      </header>
+
+      <!-- Pages -->
+      <div class="content-area" id="contentArea">
+        <!-- ==================== PAGE: OVERVIEW ==================== -->
+        <div class="page active" id="page-overview">
+          <!-- KPI Row -->
+          <div class="kpi-row" id="kpiRow"></div>
+
+          <!-- Charts Row 1 -->
+          <div class="charts-grid-2">
+            <div class="chart-card glass-card">
+              <div class="card-header">
                 <div>
-                    <h1 class="page-title" id="pageTitle">Overview</h1>
-                    <p class="page-breadcrumb" id="pageBreadcrumb">Dashboard → Overview</p>
+                  <h2>Admission Trajectory</h2>
+                  <p class="card-subtitle">
+                    Cumulative admissions — all three sessions
+                  </p>
                 </div>
+                <div class="legend-dots">
+                  <span class="ldot cyan">2024</span>
+                  <span class="ldot purple">2025</span>
+                  <span class="ldot blue">2026</span>
+                </div>
+              </div>
+              <div class="chart-wrap h400">
+                <canvas id="overviewTrendChart"></canvas>
+              </div>
             </div>
-            <div class="topbar-right">
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="Search programs..." class="search-input">
-                    <span class="search-icon">🔍</span>
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>Year-over-Year Growth</h2>
+                  <p class="card-subtitle">Monthly delta: 2025 vs 2024</p>
                 </div>
-                <button class="refresh-btn" id="refreshBtn" title="Refresh data from Google Sheets">
-                    ↻ Refresh Data
-                </button>
-                <div class="year-badges" id="yearBadges">
-                    <!-- Generated by JS from config -->
-                </div>
+              </div>
+              <div class="chart-wrap h400"><canvas id="yoyChart"></canvas></div>
             </div>
-        </header>
+          </div>
 
-        <!-- Pages -->
-        <div class="content-area" id="contentArea">
-
-            <!-- ==================== PAGE: OVERVIEW ==================== -->
-            <div class="page active" id="page-overview">
-                <!-- KPI Row -->
-                <div class="kpi-row" id="kpiRow"></div>
-
-                <!-- Charts Row 1 -->
-                <div class="charts-grid-2">
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>Admission Trajectory</h2>
-                                <p class="card-subtitle">Cumulative admissions — all three sessions</p>
-                            </div>
-                            <div class="legend-dots">
-                                <span class="ldot cyan">2024</span>
-                                <span class="ldot purple">2025</span>
-                                <span class="ldot blue">2026</span>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h400"><canvas id="overviewTrendChart"></canvas></div>
-                    </div>
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>Year-over-Year Growth</h2>
-                                <p class="card-subtitle">Monthly delta: 2025 vs 2024</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h400"><canvas id="yoyChart"></canvas></div>
-                    </div>
+          <!-- Charts Row 2 -->
+          <div class="charts-grid-3">
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>Program Category Mix</h2>
+                  <p class="card-subtitle">
+                    Intake distribution by program type
+                  </p>
                 </div>
-
-                <!-- Charts Row 2 -->
-                <div class="charts-grid-3">
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>Program Category Mix</h2>
-                                <p class="card-subtitle">Intake distribution by program type</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h300"><canvas id="categoryDonutChart"></canvas></div>
-                    </div>
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>Admission Velocity</h2>
-                                <p class="card-subtitle">Monthly new admissions (rate per period)</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h300"><canvas id="velocityChart"></canvas></div>
-                    </div>
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>2026 Fill Rate by Category</h2>
-                                <p class="card-subtitle">Admissions as % of total intake</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h300"><canvas id="fillRateOverview"></canvas></div>
-                    </div>
-                </div>
+              </div>
+              <div class="chart-wrap h300">
+                <canvas id="categoryDonutChart"></canvas>
+              </div>
             </div>
-
-            <!-- ==================== PAGE: AI INSIGHTS ==================== -->
-            <div class="page" id="page-insights">
-                <div class="charts-grid-1">
-                    <div class="insight-header-card glass-card">
-                        <div class="insight-icon">✨</div>
-                        <div>
-                            <h2 style="font-size: 1.5rem; color: #fff; margin-bottom: 0.5rem; letter-spacing: -0.02em;">Automated Data Intelligence</h2>
-                            <p class="card-subtitle">Real-time analytical narrative extracted directly from the entire 2024–2026 admissions dataset.</p>
-                        </div>
-                    </div>
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>Admission Velocity</h2>
+                  <p class="card-subtitle">
+                    Monthly new admissions (rate per period)
+                  </p>
                 </div>
-
-                <div class="charts-grid-2">
-                    <!-- Positive Insights -->
-                    <div class="chart-card glass-card" style="border-top: 3px solid var(--green)">
-                        <div class="card-header">
-                            <div>
-                                <h2 style="color: var(--green); display: flex; align-items: center; gap: 8px;">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                                    Growth & Strengths
-                                </h2>
-                            </div>
-                        </div>
-                        <div class="insight-content" id="insightStrengths">
-                            <!-- Populated by JS -->
-                        </div>
-                    </div>
-
-                    <!-- Concerns -->
-                    <div class="chart-card glass-card" style="border-top: 3px solid var(--rose)">
-                        <div class="card-header">
-                            <div>
-                                <h2 style="color: var(--rose); display: flex; align-items: center; gap: 8px;">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                                    Alerts & Constraints
-                                </h2>
-                            </div>
-                        </div>
-                        <div class="insight-content" id="insightConcerns">
-                            <!-- Populated by JS -->
-                        </div>
-                    </div>
+              </div>
+              <div class="chart-wrap h300">
+                <canvas id="velocityChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>2026 Fill Rate by Category</h2>
+                  <p class="card-subtitle">Admissions as % of total intake</p>
                 </div>
+              </div>
+              <div class="chart-wrap h300">
+                <canvas id="fillRateOverview"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                <div class="charts-grid-1">
-                    <div class="chart-card glass-card" style="border-top: 3px solid var(--cyan)">
-                        <div class="card-header">
-                            <div>
-                                <h2 style="color: var(--cyan); display: flex; align-items: center; gap: 8px;">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                                    Executive Trajectory Forecast
-                                </h2>
-                            </div>
-                        </div>
-                        <div class="insight-content" id="insightForecast">
-                            <!-- Populated by JS -->
-                        </div>
-                    </div>
+        <!-- ==================== PAGE: AI INSIGHTS ==================== -->
+        <div class="page" id="page-insights">
+          <div class="charts-grid-1">
+            <div class="insight-header-card glass-card">
+              <div class="insight-icon">✨</div>
+              <div>
+                <h2
+                  style="
+                    font-size: 1.5rem;
+                    color: #fff;
+                    margin-bottom: 0.5rem;
+                    letter-spacing: -0.02em;
+                  "
+                >
+                  Automated Data Intelligence
+                </h2>
+                <p class="card-subtitle">
+                  Real-time analytical narrative extracted directly from the
+                  entire 2024–2026 admissions dataset.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="charts-grid-2">
+            <!-- Positive Insights -->
+            <div
+              class="chart-card glass-card"
+              style="border-top: 3px solid var(--green)"
+            >
+              <div class="card-header">
+                <div>
+                  <h2
+                    style="
+                      color: var(--green);
+                      display: flex;
+                      align-items: center;
+                      gap: 8px;
+                    "
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    Growth & Strengths
+                  </h2>
                 </div>
+              </div>
+              <div class="insight-content" id="insightStrengths">
+                <!-- Populated by JS -->
+              </div>
             </div>
 
-            <!-- ==================== PAGE: TRENDS ==================== -->
-            <div class="page" id="page-trends">
-                <div class="charts-grid-1">
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>Full Admissions Timeline</h2>
-                                <p class="card-subtitle">Complete date-by-date cumulative admissions across all three sessions</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h450"><canvas id="fullTrendChart"></canvas></div>
-                    </div>
+            <!-- Concerns -->
+            <div
+              class="chart-card glass-card"
+              style="border-top: 3px solid var(--rose)"
+            >
+              <div class="card-header">
+                <div>
+                  <h2
+                    style="
+                      color: var(--rose);
+                      display: flex;
+                      align-items: center;
+                      gap: 8px;
+                    "
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    Alerts & Constraints
+                  </h2>
                 </div>
-                <div class="charts-grid-2">
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>Cumulative Growth Rate (%)</h2>
-                                <p class="card-subtitle">Session growth rate over time relative to Jan baseline</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h380"><canvas id="growthRateChart"></canvas></div>
-                    </div>
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>Net Admissions Acceleration</h2>
-                                <p class="card-subtitle">Period-to-period incremental gain (differentials)</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h380"><canvas id="accelerationChart"></canvas></div>
-                    </div>
+              </div>
+              <div class="insight-content" id="insightConcerns">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+
+          <div class="charts-grid-1">
+            <div
+              class="chart-card glass-card"
+              style="border-top: 3px solid var(--cyan)"
+            >
+              <div class="card-header">
+                <div>
+                  <h2
+                    style="
+                      color: var(--cyan);
+                      display: flex;
+                      align-items: center;
+                      gap: 8px;
+                    "
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    Executive Trajectory Forecast
+                  </h2>
                 </div>
-                <div class="charts-grid-2">
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>2024 vs 2025 Admissions — Radar</h2>
-                                <p class="card-subtitle">Month-by-month head-to-head comparison</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h380"><canvas id="radarChart"></canvas></div>
-                    </div>
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>Session Peak Comparison</h2>
-                                <p class="card-subtitle">Monthly max admissions per session</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h380"><canvas id="peakCompChart"></canvas></div>
-                    </div>
+              </div>
+              <div class="insight-content" id="insightForecast">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== PAGE: TRENDS ==================== -->
+        <div class="page" id="page-trends">
+          <div class="charts-grid-1">
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>Full Admissions Timeline</h2>
+                  <p class="card-subtitle">
+                    Complete date-by-date cumulative admissions across all three
+                    sessions
+                  </p>
                 </div>
+              </div>
+              <div class="chart-wrap h450">
+                <canvas id="fullTrendChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="charts-grid-2">
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>Cumulative Growth Rate (%)</h2>
+                  <p class="card-subtitle">
+                    Session growth rate over time relative to Jan baseline
+                  </p>
+                </div>
+              </div>
+              <div class="chart-wrap h380">
+                <canvas id="growthRateChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>Net Admissions Acceleration</h2>
+                  <p class="card-subtitle">
+                    Period-to-period incremental gain (differentials)
+                  </p>
+                </div>
+              </div>
+              <div class="chart-wrap h380">
+                <canvas id="accelerationChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="charts-grid-2">
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>2024 vs 2025 Admissions — Radar</h2>
+                  <p class="card-subtitle">
+                    Month-by-month head-to-head comparison
+                  </p>
+                </div>
+              </div>
+              <div class="chart-wrap h380">
+                <canvas id="radarChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>Session Peak Comparison</h2>
+                  <p class="card-subtitle">
+                    Monthly max admissions per session
+                  </p>
+                </div>
+              </div>
+              <div class="chart-wrap h380">
+                <canvas id="peakCompChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== PAGE: PROGRAMS ==================== -->
+        <div class="page" id="page-programs">
+          <!-- Controls -->
+          <div class="controls-bar glass-card">
+            <div class="ctrl-grp">
+              <label>Date Snapshot</label>
+              <select id="programDateSel" class="ctrl-input"></select>
+            </div>
+            <div class="ctrl-grp">
+              <label>Year</label>
+              <select id="programYearSel" class="ctrl-input">
+                <!-- Generated by JS from config -->
+              </select>
+            </div>
+            <div class="ctrl-grp">
+              <label>Metric</label>
+              <select id="programMetricSel" class="ctrl-input">
+                <option value="admissions">Net Admissions</option>
+                <option value="intake">Intake</option>
+                <option value="withdrawals">Withdrawals</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="charts-grid-1">
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>Program-wise Comparison</h2>
+                  <p class="card-subtitle">
+                    All programs ranked by selected metric — all three years
+                  </p>
+                </div>
+              </div>
+              <div class="chart-wrap" style="height: 550px; overflow-y: auto">
+                <div
+                  id="programBarChartContainer"
+                  style="min-height: 1000px; position: relative"
+                >
+                  <canvas id="programBarChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="charts-grid-2">
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>Top 10 Programs by Admissions</h2>
+                  <p class="card-subtitle">
+                    Highest admissions — selected year
+                  </p>
+                </div>
+              </div>
+              <div class="chart-wrap h380">
+                <canvas id="top10Chart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>Program Type Breakdown</h2>
+                  <p class="card-subtitle">
+                    Category-by-category intake vs admissions
+                  </p>
+                </div>
+              </div>
+              <div class="chart-wrap h380">
+                <canvas id="catCompChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="charts-grid-2">
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>Withdrawal Analysis</h2>
+                  <p class="card-subtitle">Programs with highest withdrawals</p>
+                </div>
+              </div>
+              <div class="chart-wrap h380">
+                <canvas id="withdrawalChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>New vs Discontinued Programs</h2>
+                  <p class="card-subtitle">
+                    Programs launched or dropped across years
+                  </p>
+                </div>
+              </div>
+              <div class="chart-wrap h380">
+                <canvas id="programStatusChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== PAGE: SCHOOLS ==================== -->
+        <div class="page" id="page-schools">
+          <div class="controls-bar glass-card">
+            <div class="ctrl-grp">
+              <label>Date Snapshot</label>
+              <select id="schoolDateSel" class="ctrl-input"></select>
+            </div>
+          </div>
+
+          <div class="charts-grid-2">
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>School-wise Admissions</h2>
+                  <p class="card-subtitle">
+                    Net admissions by school — all years
+                  </p>
+                </div>
+              </div>
+              <div class="chart-wrap h400">
+                <canvas id="schoolBarChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>School Intake Distribution</h2>
+                  <p class="card-subtitle">Seat allocation share by school</p>
+                </div>
+              </div>
+              <div class="chart-wrap h400">
+                <canvas id="schoolPieChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="charts-grid-1">
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>School Performance Radar</h2>
+                  <p class="card-subtitle">
+                    Multi-dimensional school comparison: Intake, Admissions,
+                    Withdrawals
+                  </p>
+                </div>
+              </div>
+              <div class="chart-wrap h450">
+                <canvas id="schoolRadarChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="charts-grid-2">
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>School Fill Rate (2024 vs 2025 vs 2026)</h2>
+                  <p class="card-subtitle">
+                    Schools ranked by percentage of intake filled
+                  </p>
+                </div>
+              </div>
+              <div class="chart-wrap h380">
+                <canvas id="schoolFillChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>School Withdrawals</h2>
+                  <p class="card-subtitle">
+                    Per-school dropout count across sessions
+                  </p>
+                </div>
+              </div>
+              <div class="chart-wrap h380">
+                <canvas id="schoolWithdrawChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== PAGE: INTAKE ==================== -->
+        <div class="page" id="page-intake">
+          <div class="charts-grid-3">
+            <div
+              class="chart-card glass-card stat-highlight"
+              style="--accent-clr: var(--cyan)"
+            >
+              <h3 id="intake2024Label">Intake 2024</h3>
+              <div class="big-stat" id="totalIntake2024">—</div>
+              <p>Sanctioned seats</p>
+            </div>
+            <div
+              class="chart-card glass-card stat-highlight"
+              style="--accent-clr: var(--purple)"
+            >
+              <h3 id="intake2025Label">Intake 2025</h3>
+              <div class="big-stat" id="totalIntake2025">—</div>
+              <p>Sanctioned seats</p>
+            </div>
+            <div
+              class="chart-card glass-card stat-highlight"
+              style="--accent-clr: var(--blue)"
+            >
+              <h3 id="intake2026Label">Intake 2026</h3>
+              <div class="big-stat" id="totalIntake2026">—</div>
+              <p>Sanctioned seats</p>
+            </div>
+          </div>
+
+          <div class="charts-grid-1">
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>Intake vs Actual Admissions</h2>
+                  <p class="card-subtitle">
+                    Side-by-side comparison at peak date — all years
+                  </p>
+                </div>
+              </div>
+              <div class="chart-wrap h420">
+                <canvas id="intakeVsAdmChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="charts-grid-2">
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>Fill Rate % Per Session</h2>
+                  <p class="card-subtitle">
+                    How much of capacity was filled at peak
+                  </p>
+                </div>
+              </div>
+              <div class="chart-wrap h380">
+                <canvas id="fillRateGaugeChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>Capacity Utilization Bubbles</h2>
+                  <p class="card-subtitle">
+                    Intake vs Admissions per school (bubble = withdrawals)
+                  </p>
+                </div>
+              </div>
+              <div class="chart-wrap h380">
+                <canvas id="bubbleChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="charts-grid-2">
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>Programs with Unmet Demand</h2>
+                  <p class="card-subtitle">
+                    Programs where intake far exceeds admissions
+                  </p>
+                </div>
+              </div>
+              <div class="chart-wrap h380"><canvas id="gapChart"></canvas></div>
+            </div>
+            <div class="chart-card glass-card">
+              <div class="card-header">
+                <div>
+                  <h2>Intake Change 2024 → 2026</h2>
+                  <p class="card-subtitle">
+                    How seat capacity evolved across sessions
+                  </p>
+                </div>
+              </div>
+              <div class="chart-wrap h380">
+                <canvas id="intakeChangeChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== PAGE: DATA EDITOR (DYNAMIC) ==================== -->
+        <div class="page" id="page-editor">
+          <div class="editor-container glass-card">
+            <div class="editor-header">
+              <h2>Data Editor</h2>
+              <p class="subtitle">
+                Edit admissions data. Changes auto-save to Google Sheets.
+              </p>
             </div>
 
-            <!-- ==================== PAGE: PROGRAMS ==================== -->
-            <div class="page" id="page-programs">
-                <!-- Controls -->
-                <div class="controls-bar glass-card">
-                    <div class="ctrl-grp">
-                        <label>Date Snapshot</label>
-                        <select id="programDateSel" class="ctrl-input"></select>
-                    </div>
-                    <div class="ctrl-grp">
-                        <label>Year</label>
-                        <select id="programYearSel" class="ctrl-input">
-                            <!-- Generated by JS from config -->
-                        </select>
-                    </div>
-                    <div class="ctrl-grp">
-                        <label>Metric</label>
-                        <select id="programMetricSel" class="ctrl-input">
-                            <option value="admissions">Net Admissions</option>
-                            <option value="intake">Intake</option>
-                            <option value="withdrawals">Withdrawals</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="charts-grid-1">
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>Program-wise Comparison</h2>
-                                <p class="card-subtitle">All programs ranked by selected metric — all three years</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap" style="height: 550px; overflow-y: auto;">
-                            <div id="programBarChartContainer" style="min-height: 1000px; position: relative;">
-                                <canvas id="programBarChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="charts-grid-2">
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>Top 10 Programs by Admissions</h2>
-                                <p class="card-subtitle">Highest admissions — selected year</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h380"><canvas id="top10Chart"></canvas></div>
-                    </div>
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>Program Type Breakdown</h2>
-                                <p class="card-subtitle">Category-by-category intake vs admissions</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h380"><canvas id="catCompChart"></canvas></div>
-                    </div>
-                </div>
-
-                <div class="charts-grid-2">
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>Withdrawal Analysis</h2>
-                                <p class="card-subtitle">Programs with highest withdrawals</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h380"><canvas id="withdrawalChart"></canvas></div>
-                    </div>
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>New vs Discontinued Programs</h2>
-                                <p class="card-subtitle">Programs launched or dropped across years</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h380"><canvas id="programStatusChart"></canvas></div>
-                    </div>
-                </div>
+            <!-- Date Selector (Dynamic) -->
+            <div class="editor-controls">
+              <div class="control-group">
+                <label>Select Date Snapshot:</label>
+                <select id="editorDateSel" class="form-select">
+                  <option value="">Loading dates...</option>
+                </select>
+              </div>
+              <button class="btn-secondary" id="editorSaveBtn">
+                💾 Save Changes
+              </button>
             </div>
 
-            <!-- ==================== PAGE: SCHOOLS ==================== -->
-            <div class="page" id="page-schools">
-                <div class="controls-bar glass-card">
-                    <div class="ctrl-grp">
-                        <label>Date Snapshot</label>
-                        <select id="schoolDateSel" class="ctrl-input"></select>
-                    </div>
-                </div>
-
-                <div class="charts-grid-2">
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>School-wise Admissions</h2>
-                                <p class="card-subtitle">Net admissions by school — all years</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h400"><canvas id="schoolBarChart"></canvas></div>
-                    </div>
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>School Intake Distribution</h2>
-                                <p class="card-subtitle">Seat allocation share by school</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h400"><canvas id="schoolPieChart"></canvas></div>
-                    </div>
-                </div>
-
-                <div class="charts-grid-1">
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>School Performance Radar</h2>
-                                <p class="card-subtitle">Multi-dimensional school comparison: Intake, Admissions, Withdrawals</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h450"><canvas id="schoolRadarChart"></canvas></div>
-                    </div>
-                </div>
-
-                <div class="charts-grid-2">
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>School Fill Rate (2024 vs 2025 vs 2026)</h2>
-                                <p class="card-subtitle">Schools ranked by percentage of intake filled</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h380"><canvas id="schoolFillChart"></canvas></div>
-                    </div>
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>School Withdrawals</h2>
-                                <p class="card-subtitle">Per-school dropout count across sessions</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h380"><canvas id="schoolWithdrawChart"></canvas></div>
-                    </div>
-                </div>
+            <!-- Dynamic Data Table (Generated from DATA object) -->
+            <div class="table-wrapper">
+              <table id="editorTable" class="data-table">
+                <thead id="editorTableHead">
+                  <!-- Generated by JS from config -->
+                </thead>
+                <tbody id="editorTableBody">
+                  <tr>
+                    <td colspan="11" style="text-align: center; color: #64748b">
+                      Select a date to view data
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-
-            <!-- ==================== PAGE: INTAKE ==================== -->
-            <div class="page" id="page-intake">
-                <div class="charts-grid-3">
-                    <div class="chart-card glass-card stat-highlight" style="--accent-clr: var(--cyan)">
-                        <h3 id="intake2024Label">Intake 2024</h3>
-                        <div class="big-stat" id="totalIntake2024">—</div>
-                        <p>Sanctioned seats</p>
-                    </div>
-                    <div class="chart-card glass-card stat-highlight" style="--accent-clr: var(--purple)">
-                        <h3 id="intake2025Label">Intake 2025</h3>
-                        <div class="big-stat" id="totalIntake2025">—</div>
-                        <p>Sanctioned seats</p>
-                    </div>
-                    <div class="chart-card glass-card stat-highlight" style="--accent-clr: var(--blue)">
-                        <h3 id="intake2026Label">Intake 2026</h3>
-                        <div class="big-stat" id="totalIntake2026">—</div>
-                        <p>Sanctioned seats</p>
-                    </div>
-                </div>
-
-                <div class="charts-grid-1">
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>Intake vs Actual Admissions</h2>
-                                <p class="card-subtitle">Side-by-side comparison at peak date — all years</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h420"><canvas id="intakeVsAdmChart"></canvas></div>
-                    </div>
-                </div>
-
-                <div class="charts-grid-2">
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>Fill Rate % Per Session</h2>
-                                <p class="card-subtitle">How much of capacity was filled at peak</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h380"><canvas id="fillRateGaugeChart"></canvas></div>
-                    </div>
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>Capacity Utilization Bubbles</h2>
-                                <p class="card-subtitle">Intake vs Admissions per school (bubble = withdrawals)</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h380"><canvas id="bubbleChart"></canvas></div>
-                    </div>
-                </div>
-
-                <div class="charts-grid-2">
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>Programs with Unmet Demand</h2>
-                                <p class="card-subtitle">Programs where intake far exceeds admissions</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h380"><canvas id="gapChart"></canvas></div>
-                    </div>
-                    <div class="chart-card glass-card">
-                        <div class="card-header">
-                            <div>
-                                <h2>Intake Change 2024 → 2026</h2>
-                                <p class="card-subtitle">How seat capacity evolved across sessions</p>
-                            </div>
-                        </div>
-                        <div class="chart-wrap h380"><canvas id="intakeChangeChart"></canvas></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ==================== PAGE: DATA EDITOR (DYNAMIC) ==================== -->
-            <div class="page" id="page-editor">
-                <div class="editor-container glass-card">
-                    <div class="editor-header">
-                        <h2>Data Editor</h2>
-                        <p class="subtitle">Edit admissions data. Changes auto-save to Google Sheets.</p>
-                    </div>
-
-                    <!-- Date Selector (Dynamic) -->
-                    <div class="editor-controls">
-                        <div class="control-group">
-                            <label>Select Date Snapshot:</label>
-                            <select id="editorDateSel" class="form-select">
-                                <option value="">Loading dates...</option>
-                            </select>
-                        </div>
-                        <button class="btn-secondary" id="editorSaveBtn">💾 Save Changes</button>
-                    </div>
-
-                    <!-- Dynamic Data Table (Generated from DATA object) -->
-                    <div class="table-wrapper">
-                        <table id="editorTable" class="data-table">
-                            <thead id="editorTableHead">
-                                <!-- Generated by JS from config -->
-                            </thead>
-                            <tbody id="editorTableBody">
-                                <tr><td colspan="11" style="text-align:center;color:#64748b;">Select a date to view data</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-        </div><!-- /content-area -->
-    </div><!-- /main-wrapper -->
+          </div>
+        </div>
+      </div>
+      <!-- /content-area -->
+    </div>
+    <!-- /main-wrapper -->
 
     <script src="app.js"></script>
-</body>
+  </body>
 </html>
