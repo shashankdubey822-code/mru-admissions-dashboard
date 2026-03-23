@@ -57,6 +57,10 @@
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 Intake vs Fill Rate
             </a></li>
+            <li><a href="#" class="nav-item" data-page="editor" id="nav-editor">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Data Editor
+            </a></li>
         </ul>
 
         <div class="sidebar-footer">
@@ -499,6 +503,58 @@
                             </div>
                         </div>
                         <div class="chart-wrap h380"><canvas id="intakeChangeChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== PAGE: DATA EDITOR (DYNAMIC) ==================== -->
+            <div class="page" id="page-editor">
+                <div class="editor-container glass-card">
+                    <div class="editor-header">
+                        <h2>Data Editor</h2>
+                        <p class="subtitle">Edit admissions data. Changes auto-save to Google Sheets.</p>
+                    </div>
+
+                    <!-- Date Selector (Dynamic) -->
+                    <div class="editor-controls">
+                        <div class="control-group">
+                            <label>Select Date Snapshot:</label>
+                            <select id="editorDateSel" class="form-select">
+                                <option value="">Loading dates...</option>
+                            </select>
+                        </div>
+                        <button class="btn-secondary" id="editorSaveBtn">💾 Save Changes</button>
+                    </div>
+
+                    <!-- Dynamic Data Table (Generated from DATA object) -->
+                    <div class="table-wrapper">
+                        <table id="editorTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Program</th>
+                                    <th>School</th>
+                                    <th colspan="3">2024-25</th>
+                                    <th colspan="3">2025-26</th>
+                                    <th colspan="3">2026-27</th>
+                                </tr>
+                                <tr class="subheader">
+                                    <th></th>
+                                    <th></th>
+                                    <th>Intake</th>
+                                    <th>Admissions</th>
+                                    <th>Withdrawals</th>
+                                    <th>Intake</th>
+                                    <th>Admissions</th>
+                                    <th>Withdrawals</th>
+                                    <th>Intake</th>
+                                    <th>Admissions</th>
+                                    <th>Withdrawals</th>
+                                </tr>
+                            </thead>
+                            <tbody id="editorTableBody">
+                                <tr><td colspan="11" style="text-align:center;color:#64748b;">Select a date to view data</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

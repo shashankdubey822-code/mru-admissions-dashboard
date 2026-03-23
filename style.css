@@ -533,3 +533,166 @@ body {
     color: var(--cyan);
     font-weight: 600;
 }
+
+/* ========== DATA EDITOR PAGE STYLES ========== */
+.editor-container {
+    padding: 2rem;
+    margin: 1.5rem;
+    border-radius: var(--radius);
+}
+
+.editor-header {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+}
+
+.editor-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.editor-header .subtitle {
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.editor-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    align-items: center;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.control-group label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text);
+}
+
+.form-select {
+    padding: 0.5rem 0.75rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 0.9rem;
+    cursor: pointer;
+    min-width: 200px;
+}
+
+.form-select:hover {
+    border-color: var(--border-h);
+    background: var(--surface-h);
+}
+
+.btn-secondary {
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.btn-secondary:hover {
+    background: var(--surface-h);
+    border-color: var(--border-h);
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.data-table thead {
+    background: rgba(255,255,255,0.05);
+    border-bottom: 2px solid var(--border);
+}
+
+.data-table th {
+    padding: 1rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.data-table th.subheader {
+    padding: 0.75rem 0.5rem;
+    font-weight: 500;
+    font-size: 0.8rem;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+}
+
+.data-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background var(--transition);
+}
+
+.data-table tbody tr:hover {
+    background: rgba(255,255,255,0.03);
+}
+
+.data-table td {
+    padding: 0.75rem;
+    color: var(--text);
+}
+
+.data-table .program-name {
+    font-weight: 500;
+    color: var(--cyan);
+}
+
+.data-table .school-name {
+    color: var(--muted);
+    font-size: 0.8rem;
+}
+
+.data-table .editable {
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: all var(--transition);
+    position: relative;
+}
+
+.data-table .editable:hover {
+    background: rgba(0,229,255,0.1);
+    color: var(--cyan);
+}
+
+.cell-input {
+    width: 100%;
+    padding: 0.4rem 0.5rem;
+    background: var(--surface);
+    border: 1px solid var(--cyan);
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 0.85rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.cell-input:focus {
+    outline: none;
+    border-color: var(--cyan);
+    box-shadow: 0 0 8px rgba(0,229,255,0.3);
+}
+

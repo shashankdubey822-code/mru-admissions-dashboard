@@ -54,7 +54,7 @@ function hexA(hex, alpha) {
 // 1. NAVIGATION
 // ============================================================
 
-const pages = ['overview', 'insights', 'trends', 'programs', 'schools', 'intake'];
+const pages = ['overview', 'insights', 'trends', 'programs', 'schools', 'intake', 'editor'];
 const pageTitles = {
     overview: 'Overview',
     insights: 'AI Insights',
@@ -62,6 +62,7 @@ const pageTitles = {
     programs: 'Program Analysis',
     schools:  'School Comparison',
     intake:   'Intake vs Fill Rate',
+    editor:   'Data Editor',
 };
 
 function navigateTo(pageId) {
@@ -192,6 +193,7 @@ function init() {
     renderProgramsPage();
     renderSchoolsPage();
     renderIntakePage();
+    renderEditorPage();
 }
 
 function populateSelect(id, options, defaultVal) {
@@ -1062,6 +1064,91 @@ function renderIntakePage() {
             plugins: { legend: { display: true }, tooltip: tooltipConfig(), datalabels: { display: false } },
             scales: { x: { grid: { display: false } }, y: { grid: { color: gridColor } } }
         }
+    });
+}
+
+// ============================================================
+// 7. DATA EDITOR (DYNAMIC - NO HARDCODING)
+// ============================================================
+
+function renderEditorPage() {
+    // Populate date selector from actual data (not hardcoded!)
+    const dates = Object.keys(DATA.faculty_breakdown);
+    const dateSelect = document.getElementById('editorDateSel');
+
+    if (dates.length > 0) {
+        dateSelect.innerHTML = '';
+        dates.forEach(date => {
+            const opt = document.createElement('option');
+            opt.value = date;
+            opt.textContent = date;
+            dateSelect.appendChild(opt);
+        });
+        dateSelect.value = dates[dates.length - 1]; // Default to latest
+        renderEditorTable(dates[dates.length - 1]);
+    }
+
+    // Date selector listener
+    dateSelect.addEventListener('change', (e) => {
+        renderEditorTable(e.target.value);
+    });
+}
+
+function renderEditorTable(date) {
+    // Dynamically generate table from actual program data
+    const programs = DATA.faculty_breakdown[date] || [];
+    const tbody = document.getElementById('editorTableBody');
+
+    if (programs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#64748b;">No data for this date</td></tr>';
+        return;
+    }
+
+    // Generate table rows dynamically from data
+    tbody.innerHTML = programs.map((prog, idx) => `
+        <tr data-idx="${idx}" class="data-row">
+            <td class="program-name">${prog.program}</td>
+            <td class="school-name">${prog.school}</td>
+            <td class="editable" data-year="2024" data-field="intake">${prog['2024'].intake}</td>
+            <td class="editable" data-year="2024" data-field="admissions">${prog['2024'].admissions}</td>
+            <td class="editable" data-year="2024" data-field="withdrawals">${prog['2024'].withdrawals}</td>
+            <td class="editable" data-year="2025" data-field="intake">${prog['2025'].intake}</td>
+            <td class="editable" data-year="2025" data-field="admissions">${prog['2025'].admissions}</td>
+            <td class="editable" data-year="2025" data-field="withdrawals">${prog['2025'].withdrawals}</td>
+            <td class="editable" data-year="2026" data-field="intake">${prog['2026'].intake}</td>
+            <td class="editable" data-year="2026" data-field="admissions">${prog['2026'].admissions}</td>
+            <td class="editable" data-year="2026" data-field="withdrawals">${prog['2026'].withdrawals}</td>
+        </tr>
+    `).join('');
+
+    // Attach click listeners for editing
+    document.querySelectorAll('.editable').forEach(cell => {
+        cell.addEventListener('click', () => {
+            const original = cell.textContent.trim();
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.value = original;
+            input.className = 'cell-input';
+
+            cell.innerHTML = '';
+            cell.appendChild(input);
+            input.focus();
+
+            const saveEdit = () => {
+                const newVal = input.value;
+                cell.textContent = newVal || original;
+                // Update DATA object (for when teacher saves)
+                const rowIdx = parseInt(cell.closest('tr').dataset.idx);
+                const year = cell.dataset.year;
+                const field = cell.dataset.field;
+                DATA.faculty_breakdown[date][rowIdx][year][field] = parseInt(newVal) || 0;
+            };
+
+            input.addEventListener('blur', saveEdit);
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') saveEdit();
+            });
+        });
     });
 }
 
