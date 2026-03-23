@@ -171,6 +171,9 @@ function init() {
         mainWrap.classList.toggle('expanded');
     });
 
+    // Refresh button listener
+    document.getElementById('refreshBtn')?.addEventListener('click', refreshData);
+
     // Populate date selectors
     const dates = Object.keys(DATA.faculty_breakdown);
     populateSelect('programDateSel', dates, dates[dates.length - 1]);
