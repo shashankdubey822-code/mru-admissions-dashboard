@@ -1,3 +1,13 @@
+---
+title: MRU Admissions Dashboard
+emoji: 📊
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_file: app.py
+pinned: false
+---
+
 # MRU Admissions Dashboard
 
 A real-time admissions analytics dashboard for Manav Rachna University, powered by Google Sheets and FastAPI.
